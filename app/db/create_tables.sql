@@ -1,0 +1,27 @@
+-- Пользователи
+CREATE TABLE IF NOT EXISTS users (
+    id SERIAL PRIMARY KEY, telegram_id BIGINT UNIQUE NOT NULL, username VARCHAR(255),
+    first_name VARCHAR(255), is_vip BOOLEAN DEFAULT FALSE, vip_expires TIMESTAMP,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP, is_admin BOOLEAN DEFAULT FALSE
+);
+-- Серверы
+CREATE TABLE IF NOT EXISTS servers (
+    id SERIAL PRIMARY KEY, user_id INTEGER REFERENCES users(id) ON DELETE CASCADE,
+    name VARCHAR(255) NOT NULL, ip VARCHAR(255) NOT NULL, port INTEGER NOT NULL,
+    login_user VARCHAR(255) NOT NULL, password_encrypted TEXT NOT NULL,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP, is_active BOOLEAN DEFAULT TRUE
+);
+-- VIP-подписки
+CREATE TABLE IF NOT EXISTS subscriptions (
+    id SERIAL PRIMARY KEY, user_id INTEGER REFERENCES users(id) ON DELETE CASCADE,
+    payment_id VARCHAR(255), amount NUMERIC(10, 2), provider VARCHAR(50),
+    status VARCHAR(50), created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    expires_at TIMESTAMP, duration_days INTEGER -- ДОБАВЛЕНО ПОЛЕ
+);
+-- Настройки
+CREATE TABLE IF NOT EXISTS settings ( key VARCHAR(255) PRIMARY KEY, value TEXT, updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP );
+-- Логи
+CREATE TABLE IF NOT EXISTS activity_logs (
+    id SERIAL PRIMARY KEY, user_id INTEGER REFERENCES users(id) ON DELETE CASCADE,
+    action VARCHAR(255), details TEXT, timestamp TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
